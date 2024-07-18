@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?><process version="10.4.000">
+  <context>
+    <input/>
+    <output/>
+    <macros/>
+  </context>
+  <operator activated="true" class="process" compatibility="10.4.000" expanded="true" name="Process">
+    <parameter key="logverbosity" value="init"/>
+    <parameter key="random_seed" value="2001"/>
+    <parameter key="send_mail" value="never"/>
+    <parameter key="notification_email" value=""/>
+    <parameter key="process_duration_for_mail" value="30"/>
+    <parameter key="encoding" value="UTF-8"/>
+    <process expanded="true">
+      <operator activated="true" class="retrieve" compatibility="10.4.000" expanded="true" height="68" name="Retrieve Traffic_Collision_Data_from_2010_to_Present_20240711" width="90" x="45" y="34">
+        <parameter key="repository_entry" value="//Local Repository/data/Assignment3/Traffic_Collision_Data_from_2010_to_Present_20240711"/>
+      </operator>
+      <operator activated="true" class="multiply" compatibility="10.4.000" expanded="true" height="103" name="Multiply (Original)" width="90" x="179" y="34"/>
+      <operator activated="true" class="blending:select_attributes" compatibility="10.4.000" expanded="true" height="82" name="Select Attributes" width="90" x="313" y="85">
+        <parameter key="type" value="exclude attributes"/>
+        <parameter key="attribute_filter_type" value="a subset"/>
+        <parameter key="select_attribute" value=""/>
+        <parameter key="select_subset" value="Area Name␞Crime Code Description␞Premise Description␞Address␞Cross Street␞Crime Code␞Location"/>
+        <parameter key="also_apply_to_special_attributes_(id,_label..)" value="false"/>
+      </operator>
+      <operator activated="true" class="filter_examples" compatibility="10.4.000" expanded="true" height="103" name="Filter (MOCodes)" width="90" x="514" y="85">
+        <parameter key="parameter_expression" value="date_get([Date Occurred], DATE_UNIT_YEAR) == 2023 &amp;&amp;&#10;length([MO Codes])&gt;=24 &amp;&amp;&#10;(contains([MO Codes], &quot;3028&quot;) || &#10;contains([MO Codes], &quot;3027&quot;) || &#10;contains([MO Codes], &quot;3024&quot;) || &#10;contains([MO Codes], &quot;3025&quot;) || &#10;contains([MO Codes], &quot;3026&quot;))"/>
+        <parameter key="condition_class" value="expression"/>
+        <parameter key="invert_filter" value="false"/>
+        <list key="filters_list"/>
+        <parameter key="filters_logic_and" value="true"/>
+        <parameter key="filters_check_metadata" value="true"/>
+      </operator>
+      <operator activated="true" class="filter_examples" compatibility="10.4.000" expanded="true" height="103" name="Filter (MissingData)" width="90" x="715" y="85">
+        <parameter key="parameter_expression" value=""/>
+        <parameter key="condition_class" value="custom_filters"/>
+        <parameter key="invert_filter" value="false"/>
+        <list key="filters_list">
+          <parameter key="filters_entry_key" value="DR Number.is_not_missing."/>
+          <parameter key="filters_entry_key" value="Date Reported.is_not_missing."/>
+          <parameter key="filters_entry_key" value="Date Occurred.is_not_missing."/>
+          <parameter key="filters_entry_key" value="Time Occurred.is_not_missing."/>
+          <parameter key="filters_entry_key" value="Area ID.is_not_missing."/>
+          <parameter key="filters_entry_key" value="Reporting District.is_not_missing."/>
+          <parameter key="filters_entry_key" value="MO Codes.is_not_missing."/>
+          <parameter key="filters_entry_key" value="Victim Age.is_not_missing."/>
+          <parameter key="filters_entry_key" value="Victim Sex.is_not_missing."/>
+          <parameter key="filters_entry_key" value="Victim Descent.is_not_missing."/>
+          <parameter key="filters_entry_key" value="Premise Code.is_not_missing."/>
+        </list>
+        <parameter key="filters_logic_and" value="true"/>
+        <parameter key="filters_check_metadata" value="true"/>
+      </operator>
+      <operator activated="true" class="filter_examples" compatibility="10.4.000" expanded="true" height="103" name="Filter (Sex)" width="90" x="916" y="85">
+        <parameter key="parameter_expression" value="'Victim Sex' is in ['M', 'F', 'X']"/>
+        <parameter key="condition_class" value="custom_filters"/>
+        <parameter key="invert_filter" value="false"/>
+        <list key="filters_list">
+          <parameter key="filters_entry_key" value="Victim Sex.equals.M"/>
+          <parameter key="filters_entry_key" value="Victim Sex.equals.F"/>
+          <parameter key="filters_entry_key" value="Victim Sex.equals.X"/>
+        </list>
+        <parameter key="filters_logic_and" value="false"/>
+        <parameter key="filters_check_metadata" value="true"/>
+      </operator>
+      <operator activated="true" class="multiply" compatibility="10.4.000" expanded="true" height="103" name="Multiply" width="90" x="1117" y="85"/>
+      <operator activated="true" class="sample" compatibility="10.4.000" expanded="true" height="82" name="Sample" width="90" x="1318" y="136">
+        <parameter key="sample" value="absolute"/>
+        <parameter key="balance_data" value="false"/>
+        <parameter key="sample_size" value="10000"/>
+        <parameter key="sample_ratio" value="0.1"/>
+        <parameter key="sample_probability" value="0.1"/>
+        <list key="sample_size_per_class"/>
+        <list key="sample_ratio_per_class"/>
+        <list key="sample_probability_per_class"/>
+        <parameter key="use_local_random_seed" value="false"/>
+        <parameter key="local_random_seed" value="1992"/>
+      </operator>
+      <operator activated="true" class="blending:generate_columns" compatibility="10.4.000" expanded="true" height="82" name="Generate Attributes(Date/Time)" width="90" x="1519" y="136">
+        <list key="function_descriptions">
+          <parameter key="MonthOccurred" value="date_get([Date Occurred], DATE_UNIT_MONTH)+1"/>
+          <parameter key="HourOccurred" value="floor([Time Occurred]/100)"/>
+          <parameter key="ReportingDelay" value="date_diff([Date Occurred], [Date Reported],  DATE_UNIT_DAY)"/>
+        </list>
+        <parameter key="keep_all_columns" value="true"/>
+        <parameter key="default_time_zone" value="America/New_York"/>
+      </operator>
+      <operator activated="true" class="date_to_numerical" compatibility="10.4.000" expanded="true" height="82" name="Date to Numerical" width="90" x="1720" y="136">
+        <parameter key="attribute_name" value="Date Occurred"/>
+        <parameter key="time_unit" value="day"/>
+        <parameter key="millisecond_relative_to" value="second"/>
+        <parameter key="second_relative_to" value="minute"/>
+        <parameter key="minute_relative_to" value="hour"/>
+        <parameter key="hour_relative_to" value="day"/>
+        <parameter key="day_relative_to" value="week"/>
+        <parameter key="week_relative_to" value="year"/>
+        <parameter key="month_relative_to" value="year"/>
+        <parameter key="quarter_relative_to" value="year"/>
+        <parameter key="half_year_relative_to" value="year"/>
+        <parameter key="year_relative_to" value="era"/>
+        <parameter key="keep_old_attribute" value="true"/>
+      </operator>
+      <operator activated="true" class="real_to_integer" compatibility="10.4.000" expanded="true" height="82" name="Real to Integer" width="90" x="1854" y="136">
+        <parameter key="attribute_filter_type" value="single"/>
+        <parameter key="attribute" value="Date Occurred_day"/>
+        <parameter key="attributes" value=""/>
+        <parameter key="use_except_expression" value="false"/>
+        <parameter key="value_type" value="real"/>
+        <parameter key="use_value_type_exception" value="false"/>
+        <parameter key="except_value_type" value="real"/>
+        <parameter key="block_type" value="value_series_end"/>
+        <parameter key="use_block_type_exception" value="false"/>
+        <parameter key="except_block_type" value="value_series_end"/>
+        <parameter key="invert_selection" value="false"/>
+        <parameter key="include_special_attributes" value="false"/>
+        <parameter key="round_values" value="false"/>
+      </operator>
+      <operator activated="true" class="blending:rename" compatibility="10.4.000" expanded="true" height="82" name="Rename" width="90" x="1988" y="136">
+        <list key="rename attributes">
+          <parameter key="Date Occurred_day" value="DayOfWeek"/>
+        </list>
+        <parameter key="from_attribute" value=""/>
+        <parameter key="to_attribute" value=""/>
+      </operator>
+      <operator activated="true" class="multiply" compatibility="10.4.000" expanded="true" height="103" name="Multiply (Construct)" width="90" x="2122" y="136"/>
+      <operator activated="true" class="blending:generate_columns" compatibility="10.4.000" expanded="true" height="82" name="Generate Attributes (MO)" width="90" x="2323" y="238">
+        <list key="function_descriptions">
+          <parameter key="InjuryStatus" value="if(contains([MO Codes], &quot;3028&quot;), &quot;0 - No Injury&quot;, &#10;   if(contains([MO Codes], &quot;3027&quot;) || contains([MO Codes], &quot;3024&quot;) || contains([MO Codes], &quot;3025&quot;) || contains([MO Codes], &quot;3026&quot;), &quot;1 - Injury&quot;, &#10;      &quot;9 - Unknown&quot;)&#10;)"/>
+          <parameter key="AtIntersection " value="if(contains([MO Codes], &quot;3036&quot;), &quot;Yes&quot;, &#10;  if(contains([MO Codes], &quot;3037&quot;), &quot;No&quot;, &quot;Unknown&quot;)&#10;)"/>
+          <parameter key="CollisionType" value="if(contains([MO Codes], &quot;3003&quot;), &quot;Veh vs Ped&quot;,&#10;  if(contains([MO Codes], &quot;3004&quot;), &quot;Veh vs Veh&quot;,&#10;    if(contains([MO Codes], &quot;3006&quot;), &quot;Veh vs Parked Veh&quot;,&#10;      if(contains([MO Codes], &quot;3007&quot;), &quot;Veh vs Train&quot;,&#10;        if(contains([MO Codes], &quot;3008&quot;), &quot;Veh vs Bike&quot;,&#10;          if(contains([MO Codes], &quot;3009&quot;) , &quot;Veh vs M/C&quot;,&#10;            if(contains([MO Codes], &quot;3011&quot;), &quot;Veh vs Fixed Object&quot;,&#10;              if(contains([MO Codes], &quot;3012&quot;), &quot;Veh vs Other Object&quot;,&#10;                if(contains([MO Codes], &quot;3013&quot;), &quot;M/C vs Veh&quot;,&#10;                  if(contains([MO Codes], &quot;3014&quot;), &quot;M/C vs Fixed Object&quot;, &#10;                    if(contains([MO Codes], &quot;3015&quot;), &quot;M/C vs Other&quot;,&#10;                      if(contains([MO Codes], &quot;3016&quot;), &quot;Bike vs Veh&quot;,&#10;                        if(contains([MO Codes], &quot;3018&quot;), &quot;Bike vs Other&quot;, &quot;Unknown&quot;)&#10;                        )&#10;                      )  &#10;                    )&#10;                  )&#10;                )&#10;             ) &#10;          ) &#10;        ) &#10;      )&#10;    )&#10;  )&#10;)"/>
+        </list>
+        <parameter key="keep_all_columns" value="true"/>
+        <parameter key="default_time_zone" value="America/New_York"/>
+      </operator>
+      <operator activated="true" class="blending:select_attributes" compatibility="10.4.000" expanded="true" height="82" name="Select Attributes (2)" width="90" x="2524" y="238">
+        <parameter key="type" value="include attributes"/>
+        <parameter key="attribute_filter_type" value="a subset"/>
+        <parameter key="select_attribute" value=""/>
+        <parameter key="select_subset" value="Area ID␞AtIntersection ␞CollisionType␞DayOfWeek␞DR Number␞HourOccurred␞MonthOccurred␞Premise Code␞Reporting District␞ReportingDelay␞Victim Age␞Victim Descent␞Victim Sex␞InjuryStatus"/>
+        <parameter key="also_apply_to_special_attributes_(id,_label..)" value="false"/>
+      </operator>
+      <operator activated="true" class="blending:set_role" compatibility="10.4.000" expanded="true" height="82" name="Set Role" width="90" x="2658" y="238">
+        <list key="set_roles">
+          <parameter key="DR Number" value="id"/>
+          <parameter key="InjuryStatus" value="label"/>
+        </list>
+      </operator>
+      <operator activated="true" class="python_scripting:execute_python" compatibility="10.1.000" expanded="true" height="103" name="Execute Python" width="90" x="2323" y="136">
+        <parameter key="script" value="import pandas&#10;&#10;# rm_main is a mandatory function, &#10;# the number of arguments has to be the number of input ports (can be none),&#10;#     or the number of input ports plus one if &quot;use macros&quot; parameter is set&#10;# if you want to use macros, use this instead and check &quot;use macros&quot; parameter:&#10;#def rm_main(data,macros):&#10;def rm_main(data, n=50):&#10;&#10;&#9;# Get the MO Codes column&#10;&#9;mo_codes = data[&quot;MO Codes&quot;].str.split(&quot; &quot;).explode()&#10;&#9;&#10;&#9;# Calculate code frequencies&#10;&#9;code_counts = mo_codes.value_counts().reset_index(name=&quot;Count&quot;)&#10;&#9;code_counts.columns = [&quot;Code&quot;, &quot;Code Count&quot;]&#10;&#10;&#9;# Sort by code count (descending) and select top 50&#10;&#9;top_n_codes = code_counts.sort_values(by=&quot;Code Count&quot;, ascending=False).head(n)&#10;&#9;&#10;&#9;# Set the output table&#10;&#9;output_table = top_n_codes&#10;&#9;return output_table"/>
+        <parameter key="notebook_cell_tag_filter" value=""/>
+        <parameter key="use_default_python" value="true"/>
+        <parameter key="package_manager" value="conda (anaconda)"/>
+        <parameter key="use_macros" value="false"/>
+      </operator>
+      <operator activated="true" class="multiply" compatibility="10.4.000" expanded="true" height="103" name="Multiply (2)" width="90" x="2792" y="238"/>
+      <operator activated="true" class="write_csv" compatibility="10.4.000" expanded="true" height="82" name="Write CSV" width="90" x="2926" y="340">
+        <parameter key="csv_file" value="C:/Users/ryany/OneDrive/文档/AIStudio/Assignment3/Traffic_Collision_Data_2023_Sample10000DT.csv"/>
+        <parameter key="column_separator" value=","/>
+        <parameter key="write_attribute_names" value="true"/>
+        <parameter key="quote_nominal_values" value="true"/>
+        <parameter key="format_date_attributes" value="true"/>
+        <parameter key="date_format" value="yyyy-MM-dd HH:mm:ss"/>
+        <parameter key="append_to_file" value="false"/>
+        <parameter key="encoding" value="UTF-8"/>
+      </operator>
+      <connect from_op="Retrieve Traffic_Collision_Data_from_2010_to_Present_20240711" from_port="output" to_op="Multiply (Original)" to_port="input"/>
+      <connect from_op="Multiply (Original)" from_port="output 1" to_port="result 1"/>
+      <connect from_op="Multiply (Original)" from_port="output 2" to_op="Select Attributes" to_port="example set input"/>
+      <connect from_op="Select Attributes" from_port="example set output" to_op="Filter (MOCodes)" to_port="example set input"/>
+      <connect from_op="Filter (MOCodes)" from_port="example set output" to_op="Filter (MissingData)" to_port="example set input"/>
+      <connect from_op="Filter (MissingData)" from_port="example set output" to_op="Filter (Sex)" to_port="example set input"/>
+      <connect from_op="Filter (Sex)" from_port="example set output" to_op="Multiply" to_port="input"/>
+      <connect from_op="Multiply" from_port="output 1" to_port="result 2"/>
+      <connect from_op="Multiply" from_port="output 2" to_op="Sample" to_port="example set input"/>
+      <connect from_op="Sample" from_port="example set output" to_op="Generate Attributes(Date/Time)" to_port="table input"/>
+      <connect from_op="Generate Attributes(Date/Time)" from_port="table output" to_op="Date to Numerical" to_port="example set input"/>
+      <connect from_op="Date to Numerical" from_port="example set output" to_op="Real to Integer" to_port="example set input"/>
+      <connect from_op="Real to Integer" from_port="example set output" to_op="Rename" to_port="example set input"/>
+      <connect from_op="Rename" from_port="example set output" to_op="Multiply (Construct)" to_port="input"/>
+      <connect from_op="Multiply (Construct)" from_port="output 1" to_op="Execute Python" to_port="input 1"/>
+      <connect from_op="Multiply (Construct)" from_port="output 2" to_op="Generate Attributes (MO)" to_port="table input"/>
+      <connect from_op="Generate Attributes (MO)" from_port="table output" to_op="Select Attributes (2)" to_port="example set input"/>
+      <connect from_op="Select Attributes (2)" from_port="example set output" to_op="Set Role" to_port="example set input"/>
+      <connect from_op="Set Role" from_port="example set output" to_op="Multiply (2)" to_port="input"/>
+      <connect from_op="Execute Python" from_port="output 1" to_port="result 3"/>
+      <connect from_op="Multiply (2)" from_port="output 1" to_port="result 4"/>
+      <connect from_op="Multiply (2)" from_port="output 2" to_op="Write CSV" to_port="input"/>
+      <portSpacing port="source_input 1" spacing="0"/>
+      <portSpacing port="sink_result 1" spacing="0"/>
+      <portSpacing port="sink_result 2" spacing="0"/>
+      <portSpacing port="sink_result 3" spacing="0"/>
+      <portSpacing port="sink_result 4" spacing="0"/>
+      <portSpacing port="sink_result 5" spacing="0"/>
+    </process>
+  </operator>
+</process>
